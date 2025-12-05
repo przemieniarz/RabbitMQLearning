@@ -13,6 +13,9 @@ await channel.QueueDeclareAsync(
     autoDelete: false,
     arguments: null);
 
+//jezeli worker jest obciazony to nie dorzucamy mu nowych zadan
+await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
+
 Console.WriteLine(" [*] Waiting for messages.");
 
 var consumer = new AsyncEventingBasicConsumer(channel);
