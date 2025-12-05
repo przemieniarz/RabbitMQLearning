@@ -6,18 +6,24 @@ using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
 await channel.QueueDeclareAsync(
-    queue: "hello",
-    durable: false,
+    queue: "task_queue", //jezeli wczesniej bylo durable false na danym queue,
+    durable: true,       //to trzeba utworzyc nowe bo nie da się nadpisac typu
     exclusive: false,
     autoDelete: false,
     arguments: null);
 
 var message = GetMessage(args);
 var body = Encoding.UTF8.GetBytes(message);
+var properties = new BasicProperties
+{
+    Persistent = true
+};
 
 await channel.BasicPublishAsync(
     exchange: string.Empty,
-    routingKey: "hello",
+    routingKey: "task_queue",
+    mandatory: true,
+    basicProperties: properties,
     body: body);
 
 Console.WriteLine($"[x] Sent {message}");
